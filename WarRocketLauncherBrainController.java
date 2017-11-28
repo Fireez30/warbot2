@@ -14,7 +14,6 @@ import edu.warbot.agents.percepts.WarPercept;
 import edu.warbot.brains.WarBrain;
 import edu.warbot.brains.brains.WarExplorerBrain;
 import edu.warbot.communications.WarMessage;
-import test.WarExplorerBrainController;
 
 public abstract class WarRocketLauncherBrainController extends WarExplorerBrain {
 
@@ -105,7 +104,7 @@ public abstract class WarRocketLauncherBrainController extends WarExplorerBrain 
 				return m;
 		}
 
-		broadcastMessageToAgentType(WarAgentType.WarBase, "Where are you?", "");
+		broadcastMessageToAgentType(WarAgentType.WarBase, "?H", "");
 		return null;
 	}
 

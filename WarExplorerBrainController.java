@@ -50,7 +50,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					me.setHeading(m.getAngle());
 
 				//j'envoie un message aux bases pour savoir où elle sont..
-				me.broadcastMessageToAgentType(WarAgentType.WarBase, "Where are you?", (String[]) null);
+				me.broadcastMessageToAgentType(WarAgentType.WarBase, "?H", (String[]) null);
 
 				return(MovableWarAgent.ACTION_MOVE);
 
@@ -69,13 +69,33 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 
 		}
 	};
+	
+	public int timeOut = 0;
+	
+	static WTask waitForPeople = new WTask() {
+		String exec(WarBrain bc) {
+			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+			me.timeOut++;
+			ArrayList<WarAgentPercept> AllyPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarRocketLauncher);
+			
+			if (AllyPercepts.size() > 0 || me.timeOut >= 20) {
+				me.ctask = idle;
+				return null;
+			}
+			me.broadcastMessageToAll("B", "");			
+			return MovableWarAgent.ACTION_MOVE;
+		}
+	};
 
 	static WTask idle = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
-			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
+			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);			
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
-				return(MovableWarAgent.ACTION_IDLE);
+				
+				me.broadcastMessageToAll("B", "");
+				me.ctask = waitForPeople;				
+				return null;
 			}
 			else {
 				me.ctask = getFoodTask;
@@ -90,7 +110,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
 				WarAgentPercept baseP = EnemyBasePercepts.get(0); //le 0 est le plus proche normalement
-				me.broadcastMessageToAll("EnemyBase here","");
+				me.broadcastMessageToAll("B","");
 				me.ctask=idle;
 				if(me.isBagFull()){
 
@@ -150,7 +170,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 
 	private WarMessage getMessageAboutFood() {
 		for (WarMessage m : getMessages()) {
-			if(m.getMessage().equals("foodHere"))
+			if(m.getMessage().equals("N"))
 				return m;
 		}
 		return null;
@@ -162,7 +182,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				return m;
 		}
 
-		broadcastMessageToAgentType(WarAgentType.WarBase, "Where are you?", "");
+		broadcastMessageToAgentType(WarAgentType.WarBase, "?H", "");
 		return null;
 	}
 
