@@ -89,7 +89,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				else {
 					me.sendMessage(msg.getSenderID(), "|A", "");
 				}
-				
+
 				me.timeOut--;
 				return MovableWarAgent.ACTION_IDLE;
 			}
@@ -105,7 +105,6 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);			
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
-
 				me.broadcastMessageToAll("B", "");
 				me.ctask = waitForPeople;				
 				return null;
@@ -124,36 +123,35 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
 				WarAgentPercept baseP = EnemyBasePercepts.get(0); //le 0 est le plus proche normalement
 				me.broadcastMessageToAll("B","");
-				me.ctask=idle;
-				if(me.isBagFull()){
+				me.ctask=waitForPeople;
+			}
 
-					me.ctask = returnFoodTask;
-					return(null);
-				}
+			if(me.isBagFull()){
+				me.ctask = returnFoodTask;
+				return(null);
+			}
 
-				if(me.isBlocked())
-					me.setRandomHeading();
+			if(me.isBlocked())
+				me.setRandomHeading();
 
-				me.setDebugStringColor(Color.BLACK);
-				me.setDebugString("Searching food");
+			me.setDebugStringColor(Color.BLACK);
+			me.setDebugString("Searching food");
 
-				ArrayList<WarAgentPercept> foodPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsResources();
+			ArrayList<WarAgentPercept> foodPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsResources();
 
-				//Si il y a de la nouriture
-				if(foodPercepts != null && foodPercepts.size() > 0){
-					WarAgentPercept foodP = foodPercepts.get(0); //le 0 est le plus proche normalement
+			//Si il y a de la nouriture
+			if(foodPercepts != null && foodPercepts.size() > 0){
+				WarAgentPercept foodP = foodPercepts.get(0); //le 0 est le plus proche normalement
 
-					if(foodP.getDistance() > WarResource.MAX_DISTANCE_TAKE){
-						me.setHeading(foodP.getAngle());
-						return(MovableWarAgent.ACTION_MOVE);
-					}else{
-						return(MovableWarAgent.ACTION_TAKE);
-					}
-				} else {
+				if(foodP.getDistance() > WarResource.MAX_DISTANCE_TAKE){
+					me.setHeading(foodP.getAngle());
 					return(MovableWarAgent.ACTION_MOVE);
+				}else{
+					return(MovableWarAgent.ACTION_TAKE);
 				}
 			}
-			return null;
+			
+			return MovableWarAgent.ACTION_MOVE;
 		}
 	};
 
