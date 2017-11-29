@@ -83,7 +83,7 @@ public abstract class WarRocketLauncherBrainController extends WarExplorerBrain 
 
 			}
 			me.ctask = handleMsgs;
-			return null;
+			return WarRocketLauncher.ACTION_MOVE;
 		}
 	};
 

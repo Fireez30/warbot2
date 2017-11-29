@@ -78,7 +78,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.timeOut++;
 			WarMessage msg = me.getMessageFromRocketLauncher();
 
-			if (me.timeOut < 20) {
+			if (me.timeOut < 200) {
 				if (msg == null) {
 					return MovableWarAgent.ACTION_IDLE;
 				}
@@ -120,9 +120,11 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
+			
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
 				WarAgentPercept baseP = EnemyBasePercepts.get(0); //le 0 est le plus proche normalement
 				me.broadcastMessageToAll("B","");
+				me.setDebugString("Waiting");
 				me.ctask=waitForPeople;
 			}
 
@@ -140,13 +142,17 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			ArrayList<WarAgentPercept> foodPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsResources();
 
 			//Si il y a de la nouriture
+			
+			me.setDebugString(foodPercepts.get(0).toString());
+			
 			if(foodPercepts != null && foodPercepts.size() > 0){
 				WarAgentPercept foodP = foodPercepts.get(0); //le 0 est le plus proche normalement
 
 				if(foodP.getDistance() > WarResource.MAX_DISTANCE_TAKE){
 					me.setHeading(foodP.getAngle());
 					return(MovableWarAgent.ACTION_MOVE);
-				}else{
+				}
+				else{
 					return(MovableWarAgent.ACTION_TAKE);
 				}
 			}
