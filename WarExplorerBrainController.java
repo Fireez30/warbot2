@@ -69,21 +69,34 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 
 		}
 	};
-	
+
 	public int timeOut = 0;
-	
+
 	static WTask waitForPeople = new WTask() {
 		String exec(WarBrain bc) {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			me.timeOut++;
-			ArrayList<WarAgentPercept> AllyPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarRocketLauncher);
-			
-			if (AllyPercepts.size() > 0 || me.timeOut >= 20) {
+			WarMessage msg = me.getMessageFromRocketLauncher();
+
+			if (me.timeOut < 20) {
+				if (msg == null) {
+					return MovableWarAgent.ACTION_IDLE;
+				}
+
+				if (msg.getMessage().equals("A") && msg.getDistance() <= 300){
+					me.sendMessage(msg.getSenderID(), "!A", me.getPerceptsEnemiesByType(WarAgentType.WarBase).get(0) + "");
+				}
+				else {
+					me.sendMessage(msg.getSenderID(), "|A", "");
+				}
+				
+				me.timeOut--;
+				return MovableWarAgent.ACTION_IDLE;
+			}
+			else {
 				me.ctask = idle;
 				return null;
 			}
-			me.broadcastMessageToAll("B", "");			
-			return MovableWarAgent.ACTION_MOVE;
 		}
 	};
 
@@ -92,7 +105,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);			
 			if(EnemyBasePercepts != null && EnemyBasePercepts.size() > 0){
-				
+
 				me.broadcastMessageToAll("B", "");
 				me.ctask = waitForPeople;				
 				return null;
@@ -171,6 +184,14 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	private WarMessage getMessageAboutFood() {
 		for (WarMessage m : getMessages()) {
 			if(m.getMessage().equals("N"))
+				return m;
+		}
+		return null;
+	}
+
+	private WarMessage getMessageFromRocketLauncher() {
+		for (WarMessage m : getMessages()) {
+			if(m.getSenderType().equals(WarAgentType.WarRocketLauncher))
 				return m;
 		}
 		return null;
