@@ -1,0 +1,15 @@
+Name: MonEquipe2
+IconPath: MyTeam.png
+SoundPath: MyTeam.wav
+Description: |
+    Descriptions de mon équipe 2
+BrainsPackage: FSM2
+AgentsBrainClasses:
+    WarBase: WarBaseBrainController
+    WarExplorer: WarExplorerBrainController
+    WarLight: WarLightBrainController
+    WarHeavy: WarHeavyBrainController
+    WarRocketLauncher: WarRocketLauncherBrainController
+    WarKamikaze: WarKamikazeBrainController
+    WarEngineer: WarEngineerBrainController
+    WarTurret: WarTurretBrainController
