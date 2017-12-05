@@ -58,9 +58,7 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 					if (msg.get(i).getSenderType() == WarAgentType.WarExplorer) {
 						if (msg.get(i).getMessage().equals("!A")) {
 							me.setDebugString("Mission Accepted");
-							double angle = Double.parseDouble(msg.get(i).getContent()[0]);
-							me.setDebugString("Base at : " + angle);
-							me.setHeading(angle);
+							me.setHeading(msg.get(i).getAngle());
 							me.ctask = goenemybase;
 							return null;
 						}
@@ -90,7 +88,7 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 			ArrayList<WarAgentPercept> Percepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemies();
 
 			for (int i=0;i<Percepts.size();i++) {
-				if(!(Percepts.get(0).getType() == WarAgentType.WarExplorer)){
+				if(!(Percepts.get(0).getType() == WarAgentType.WarExplorer) && !(Percepts.get(0).getType() == WarAgentType.WarFood)){
 					me.setHeading(Percepts.get(0).getAngle());
 					me.setDebugString("A l'attaque");
 					if (me.isReloaded())
@@ -110,8 +108,6 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 	static WTask randomMove = new WTask() { 
 		String exec(WarBrain bc){
 			WarLightBrainController me = (WarLightBrainController) bc;
-
-			me.setDebugString("IM FREE");
 
 			if(me.isBlocked())
 				me.setRandomHeading();

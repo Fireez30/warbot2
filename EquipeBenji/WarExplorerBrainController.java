@@ -94,7 +94,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		String exec(WarBrain bc) {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			me.timeOut++;
-			WarMessage msg = me.getMessageFromRocketLauncher();			
+			me.setDebugString("En attente de réponse");
+			WarMessage msg = me.getMessageFromLight();			
 			if (me.timeOut < 200) {
 				if (msg == null) {
 					me.setDebugString("No Mail");
@@ -235,6 +236,14 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		return null;
 	}
 
+	private WarMessage getMessageFromLight() {
+		for (WarMessage m : getMessages()) {
+			if(m.getSenderType().equals(WarAgentType.WarLight))
+				return m;
+		}
+		return null;
+	}
+	
 	private WarMessage getMessageFromBase() {
 		for (WarMessage m : getMessages()) {
 			if(m.getSenderType().equals(WarAgentType.WarBase))

@@ -24,7 +24,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 
 	@Override
 	public String action() {
-
+u
 		List<WarMessage> messages = getMessages();
 
 		for (WarMessage message : messages) {
@@ -33,7 +33,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 		}
 
 		for (WarAgentPercept percept : getPercepts()) {
-			setDebugString("Bonjour !");
+			setDebugString("food =" + this.getNbElementsInBag());
 			if (isEnemy(percept) && percept.getType().getCategory().equals(WarAgentCategory.Soldier)) {
 				setDebugString("help");
 				broadcastMessageToAll("I'm under attack",
@@ -49,13 +49,15 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 						String.valueOf(percept.getDistance()));
 		}
 		
+		if (getNbElementsInBag() >= 0 && getHealth() <= 0.9 * getMaxHealth())
+			return WarBase.ACTION_EAT;
+		
 		if (!_alreadyCreated) {
-			setNextAgentToCreate(WarAgentType.WarEngineer);
+			setNextAgentToCreate(WarAgentType.WarLight);
 			return WarBase.ACTION_CREATE;
 		}
 
-		if (getNbElementsInBag() >= 0 && getHealth() <= 0.8 * getMaxHealth())
-			return WarBase.ACTION_EAT;
+		
 
 		if (getMaxHealth() == getHealth()) {
 			_alreadyCreated = true;
