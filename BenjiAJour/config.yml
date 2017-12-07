@@ -1,0 +1,15 @@
+Name: Eat7andDie
+IconPath: MyTeam.png
+SoundPath: MyTeam.wav
+Description: |
+    Descriptions de Eat7andDie
+BrainsPackage: FSM2
+AgentsBrainClasses:
+    WarBase: WarBaseBrainController
+    WarExplorer: WarExplorerBrainController
+    WarLight: WarLightBrainController
+    WarHeavy: WarHeavyBrainController
+    WarRocketLauncher: WarRocketLauncherBrainController
+    WarKamikaze: WarKamikazeBrainController
+    WarEngineer: WarEngineerBrainController
+    WarTurret: WarTurretBrainController
