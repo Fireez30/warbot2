@@ -1,7 +1,7 @@
 package FSM2;
 
 /** TEAM : Eat 7 and Die
- * explorer : cherche base - cherche nourriture - rapporte nourriture
+ * explorer : cherche base - cherche nourriture - rapporte nourriture (done)
  * light : déplace aléatoirement - tire sur les ennemis au hasard - se dirige automatiquement vers la base dès que réception du message
  * heavy : reste fixe - défends la base
  * engineer : ???
@@ -51,7 +51,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			//Si je ne vois pas de base
 			if(basePercepts == null | basePercepts.size() == 0){
 							
-					me.broadcastMessageToAgentType(WarAgentType.WarBase, "Where is the base", (String[]) null);
+					me.broadcastMessageToAgentType(WarAgentType.WarBase, "?H", (String[]) null);
 					ArrayList<WarAgentPercept> basePercepts2 =
 							(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
 
@@ -94,7 +94,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		String exec(WarBrain bc) {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			me.timeOut++;
-			me.setDebugString("En attente de r�ponse");
+			me.setDebugString("En attente de r�ponse");
 			WarMessage msg = me.getMessageFromLight();			
 			if (me.timeOut < 200) {
 				if (msg == null) {

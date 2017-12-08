@@ -34,7 +34,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 			ArrayList<WarAgentPercept> EnemyPercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemies();		
 			me.setDebugString("idle time");
 			if(EnemyPercepts != null && EnemyPercepts.size() > 0){
-				me.setDebugString("Ennemi repéré dans la base ");
+				me.setDebugString("Ennemi repï¿½rï¿½ dans la base ");
 				me.broadcastMessageToAll("UA", "");
 				me.ctask = waitForPeople;				
 				return null;
@@ -75,7 +75,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 		String exec(WarBrain bc){
 			WarBaseBrainController me = (WarBaseBrainController) bc;
 			me.timeOut++;
-			me.setDebugString("En attente de réponse");
+			me.setDebugString("En attente de rï¿½ponse");
 			WarMessage msg = me.getMessageFromLight();			
 			if (me.timeOut < 200) {
 				if (msg == null) {
@@ -83,7 +83,7 @@ public abstract class WarBaseBrainController extends WarBaseBrain {
 					return WarBase.ACTION_IDLE;
 				}
 
-				if (msg.getMessage().equals("AUA")){
+				if (msg.getMessage().equals("AUA") && msg.getDistance() < 200){
 					me.setDebugString("Got Mail");
 					me.sendMessage(msg.getSenderID(), "!UA", "");
 				}

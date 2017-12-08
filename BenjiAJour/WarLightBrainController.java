@@ -129,6 +129,31 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 			return null;
 		}
 	};
+	
+	static WTask defendBase = new WTask() {
+		String exec(WarBrain bc){
+			WarLightBrainController me = (WarLightBrainController) bc;
+			
+			if (me.timeOut > 20) {
+				me.ctask = randomMove;
+				return null;
+			}
+			
+			ArrayList<WarAgentPercept> Percepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemies();
+			
+			if (Percepts != null && Percepts.size() > 0) {
+				me.ctask = attackennemy;
+				return null;
+			}
+			else {
+				me.setHeading(me.getHeading() + 20);
+			}
+			
+			me.timeOut++;
+			
+			return ACTION_IDLE;
+		}
+	};
 
 	static WTask randomMove = new WTask() { 
 		String exec(WarBrain bc){
@@ -146,6 +171,17 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 				me.setHeading(base.getAngle());
 				//envois msg "B"
 				me.ctask = attackbase;
+				return null;
+			}
+			
+			ArrayList<WarAgentPercept> basePercepts2 = 
+					(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
+			
+			if(basePercepts2 != null && basePercepts2.size() > 0){
+				WarAgentPercept base = basePercepts2.get(0);
+				me.setHeading(base.getAngle());
+				//envois msg "B"
+				me.ctask = defendBase;
 				return null;
 			}
 			
