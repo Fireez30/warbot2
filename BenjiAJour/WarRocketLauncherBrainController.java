@@ -160,7 +160,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 
 			me.setHeading(PC.getAngle);
 
-			if (PC.getDistance() > 50) {
+			if (PC.getDistance() > 150) {
 				me.sendMessage(me.getID(), "DL", PC.getDistance() + "");
 				me.ctask=goForward;
 				return null;
@@ -188,7 +188,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 						distance = (double) Interger.parseInt(msgE.get(i).getContent());
 					}
 
-			if (distance > 50) {
+			if (distance > 150) {
 				me.sendMessage(me.getID(), "DL", PC.getDistance() - 1 + "");
 				return ACTION_MOVE;
 			}
