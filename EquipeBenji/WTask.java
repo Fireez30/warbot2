@@ -1,4 +1,4 @@
-package FSM2;
+package otakings;
 
 import edu.warbot.brains.WarBrain;
 

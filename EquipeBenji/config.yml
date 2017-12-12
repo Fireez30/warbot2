@@ -1,9 +1,9 @@
-Name: Eat7andDie
+Name: Otakings
 IconPath: MyTeam.png
 SoundPath: MyTeam.wav
 Description: |
-    Descriptions de Eat7andDie
-BrainsPackage: FSM2
+    Descriptions de Otakings
+BrainsPackage: otakings
 AgentsBrainClasses:
     WarBase: WarBaseBrainController
     WarExplorer: WarExplorerBrainController

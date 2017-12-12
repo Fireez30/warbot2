@@ -18,7 +18,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package FSM2;
+package otakings;
 
 /** Encapsulates a 2D vector. Allows chaining methods by returning a reference to itself
  * @author badlogicgames@gmail.com */

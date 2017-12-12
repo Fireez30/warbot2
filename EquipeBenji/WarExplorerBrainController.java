@@ -1,11 +1,6 @@
-package FSM2;
+package otakings;
 
-/** TEAM : Eat 7 and Die
- * explorer : cherche base - cherche nourriture - rapporte nourriture
- * light : déplace aléatoirement - tire sur les ennemis au hasard - se dirige automatiquement vers la base dès que réception du message
- * heavy : reste fixe - défends la base
- * engineer : ???
- * kamikaze : déplace vers nourriture - explose à vue
+/** TEAM : Otakings
  */
 
 import java.awt.Color;
@@ -15,6 +10,7 @@ import edu.warbot.agents.MovableWarAgent;
 import edu.warbot.agents.WarAgent;
 import edu.warbot.agents.WarResource;
 import edu.warbot.agents.agents.WarExplorer;
+import edu.warbot.agents.agents.WarLight;
 import edu.warbot.agents.agents.WarRocketLauncher;
 import edu.warbot.agents.enums.WarAgentType;
 import edu.warbot.agents.percepts.WarAgentPercept;
@@ -50,26 +46,26 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 
 			//Si je ne vois pas de base
 			if(basePercepts == null | basePercepts.size() == 0){
-							
-					me.broadcastMessageToAgentType(WarAgentType.WarBase, "Where is the base", (String[]) null);
-					ArrayList<WarAgentPercept> basePercepts2 =
-							(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
 
-					if(basePercepts == null | basePercepts.size() == 0){
+				me.broadcastMessageToAgentType(WarAgentType.WarBase, "?H", (String[]) null);
+				ArrayList<WarAgentPercept> basePercepts2 =
+						(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
 
-						WarMessage m = me.getMessageFromBase();
-						//Si j'ai un message de la base je vais vers elle
-						if(m != null){
-							if (m.getDistance() < WarResource.MAX_DISTANCE_TAKE) {
-								return WarExplorer.ACTION_GIVE;
-							}
-							me.setHeading(m.getAngle());						
+				if(basePercepts == null | basePercepts.size() == 0){
+
+					WarMessage m = me.getMessageFromBase();
+					//Si j'ai un message de la base je vais vers elle
+					if(m != null){
+						if (m.getDistance() < WarResource.MAX_DISTANCE_TAKE) {
+							return WarExplorer.ACTION_GIVE;
 						}
-
-						return(MovableWarAgent.ACTION_MOVE);
+						me.setHeading(m.getAngle());						
 					}
 
-					
+					return(MovableWarAgent.ACTION_MOVE);
+				}
+
+
 			}
 			else{//si je vois une base
 				WarAgentPercept base = basePercepts.get(0);
@@ -94,9 +90,9 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		String exec(WarBrain bc) {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
 			me.timeOut++;
-			me.setDebugString("En attente de r�ponse");
+			me.setDebugString("En attente de r�ponse");
 			WarMessage msg = me.getMessageFromLight();			
-			if (me.timeOut < 200) {
+			if (me.timeOut < 400) {
 				if (msg == null) {
 					me.setDebugString("No Mail");
 					return MovableWarAgent.ACTION_IDLE;
@@ -121,8 +117,8 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			}
 		}
 	};
-	
-	
+
+
 	static WTask idle = new WTask(){
 		String exec(WarBrain bc){
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
@@ -139,7 +135,20 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			}
 		}
 	};
+	
+	static WTask mangepoursurvivre = new WTask(){
+		String exec(WarBrain bc) {
+		WarExplorerBrainController me = (WarExplorerBrainController) bc;
+		if (me.getHealth()/me.getMaxHealth() > 0.8 ) {
+			me.ctask = getFoodTask;
+			return WarExplorer.ACTION_MOVE;
+		}
+		
+		if (me.isBagEmpty()) {me.ctask=retourbaseheal;return WarExplorer.ACTION_MOVE;}
 
+		return WarExplorer.ACTION_EAT;
+		}
+	};
 
 	static WTask getFoodTask = new WTask(){
 		String exec(WarBrain bc){
@@ -166,15 +175,15 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.setDebugStringColor(Color.BLACK);
 			me.setDebugString("Searching food");
 
-			
-			
-			
+
+
+
 			for (WarAgentPercept wp : me.getPercepts()) {
 
 				//Si il y a de la nouriture
 
 				if(wp.getType().equals(WarAgentType.WarFood)){
-					
+
 					me.broadcastMessageToAgentType(WarAgentType.WarExplorer, "N", "");
 					if(wp.getDistance() > WarResource.MAX_DISTANCE_TAKE){
 						me.setHeading(wp.getAngle());
@@ -185,19 +194,54 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					}
 				}
 			}
-			
+
 			WarMessage msgf = me.getMessageAboutFood();
 			if (msgf != null && msgf.getDistance() < 250){
 				me.setHeading(msgf.getAngle());
 				return WarExplorer.ACTION_MOVE;
 			}
-			
+
 			return WarExplorer.ACTION_MOVE;
 
 		}
 	};
 
+	static WTask retourbaseheal = new WTask() {
+		String exec(WarBrain bc){
+			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+			if (me.getHealth()/me.getMaxHealth() > 0.9) {
+				me.ctask=getFoodTask;
+				return WarExplorer.ACTION_MOVE;
+			}
 
+			ArrayList<WarAgentPercept> basePercepts = 
+					(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
+			if(basePercepts != null | basePercepts.size() != 0){
+				if (!me.isBagEmpty()) return WarLight.ACTION_EAT;
+				else {return WarLight.ACTION_IDLE;}
+			}
+
+			WarMessage m = me.getMessageFromBase();
+			if (!(m==null) && m.getMessage()=="here") {
+				me.setHeading(m.getAngle());
+				return WarLight.ACTION_MOVE;
+			}
+
+			return WarLight.ACTION_MOVE;
+
+		}
+	};
+
+
+
+	public void reflexes(){
+		setDebugString("reflexes");
+		if (getHealth()/getMaxHealth() < 0.2) {
+			if (!isBagEmpty()) { ctask=mangepoursurvivre;}
+			broadcastMessageToAgentType(WarAgentType.WarBase, "where", "");
+			ctask=retourbaseheal;
+		}
+	}
 
 	public WarExplorerBrainController() {
 		super();
@@ -206,7 +250,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 
 	@Override
 	public String action() {
-
+		reflexes();
 		// Develop behaviour here
 		String toReturn = ctask.exec(this);   // le run de la FSM
 
@@ -243,7 +287,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		}
 		return null;
 	}
-	
+
 	private WarMessage getMessageFromBase() {
 		for (WarMessage m : getMessages()) {
 			if(m.getSenderType().equals(WarAgentType.WarBase))
@@ -255,5 +299,4 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	}
 
 }
-
 

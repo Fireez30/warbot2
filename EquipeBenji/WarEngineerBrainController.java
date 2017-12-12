@@ -1,4 +1,4 @@
-package FSM2;
+package otakings;
 
 import edu.warbot.agents.agents.WarEngineer;
 import edu.warbot.brains.brains.WarEngineerBrain;
@@ -12,7 +12,7 @@ public abstract class WarEngineerBrainController extends WarEngineerBrain {
 
     @Override
     public String action() {
-
+    	
         return WarEngineer.ACTION_IDLE;
     }
 }

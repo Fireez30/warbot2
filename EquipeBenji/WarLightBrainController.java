@@ -1,4 +1,4 @@
-package FSM2;
+package otakings;
 
 
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 
 	WTask ctask;
 
+	
 	static WTask handleMsgs = new WTask(){ 		
 		String exec(WarBrain bc){
 			WarLightBrainController me = (WarLightBrainController) bc;
@@ -29,8 +30,17 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 			for(int i=0;i<msgE.size();i++) {
 				if (msgE.get(i).getSenderType() == WarAgentType.WarExplorer) {
 					if (msgE.get(i).getMessage().equals("B")) {
-						me.setDebugString("Message base recu ! ");
+						me.setDebugString("Message base adverse recu ! ");
 						me.sendMessage(msgE.get(i).getSenderID(), "A", "");
+						me.ctask = waitAnswer;
+						return null;
+					}
+				}
+				
+				if (msgE.get(i).getSenderType() == WarAgentType.WarBase) {
+					if (msgE.get(i).getMessage().equals("UA")) {
+						me.setDebugString("Base en danger ! ");
+						me.sendMessage(msgE.get(i).getSenderID(), "AUA");
 						me.ctask = waitAnswer;
 						return null;
 					}
@@ -69,6 +79,22 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 							return null;
 						}
 					}
+					
+					if (msg.get(i).getSenderType() == WarAgentType.WarBase) {
+						if (msg.get(i).getMessage().equals("!UA")) {
+							me.setDebugString("Mission Accepted");
+							me.setHeading(msg.get(i).getAngle());
+							me.ctask = randomMove;
+							return null;
+						}
+
+						else if (msg.get(i).getMessage().equals("|UA")) {
+							me.setDebugString("Mission Denied");
+							me.ctask = randomMove;
+							return null;
+						}
+					}
+					
 				}
 			}
 
@@ -104,6 +130,32 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 			return null;
 		}
 	};
+	
+	static WTask defendBase = new WTask() {
+		String exec(WarBrain bc){
+			WarLightBrainController me = (WarLightBrainController) bc;
+			
+			if (me.timeOut > 20) {
+				me.timeOut = 0;
+				me.ctask = randomMove;
+				return null;
+			}
+			
+			ArrayList<WarAgentPercept> Percepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemies();
+			
+			if (Percepts != null && Percepts.size() > 0) {
+				me.ctask = attackennemy;
+				return null;
+			}
+			else {
+				me.setHeading(me.getHeading() + 20);
+			}
+			
+			me.timeOut++;
+			
+			return ACTION_IDLE;
+		}
+	};
 
 	static WTask randomMove = new WTask() { 
 		String exec(WarBrain bc){
@@ -121,6 +173,17 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 				me.setHeading(base.getAngle());
 				//envois msg "B"
 				me.ctask = attackbase;
+				return null;
+			}
+			
+			ArrayList<WarAgentPercept> basePercepts2 = 
+					(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
+			
+			if(basePercepts2 != null && basePercepts2.size() > 0){
+				WarAgentPercept base = basePercepts2.get(0);
+				me.setHeading(base.getAngle());
+				//envois msg "B"
+				me.ctask = defendBase;
 				return null;
 			}
 			
@@ -161,6 +224,32 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 		}
 	};
 
+	static WTask retourbaseheal = new WTask() {
+		String exec(WarBrain bc){
+			WarLightBrainController me = (WarLightBrainController) bc;
+			if (me.getHealth()/me.getMaxHealth() > 0.9) {
+			me.ctask=randomMove;
+			return WarLight.ACTION_MOVE;
+			}
+			
+			ArrayList<WarAgentPercept> basePercepts = 
+					(ArrayList<WarAgentPercept>) me.getPerceptsAlliesByType(WarAgentType.WarBase);
+			if(basePercepts != null | basePercepts.size() != 0){
+				if (!me.isBagEmpty()) return WarLight.ACTION_EAT;
+				else {return WarLight.ACTION_IDLE;}
+			}
+			
+			WarMessage m = me.getMessageFromBase();
+			if (!(m==null) && m.getMessage()=="here") {
+				me.setHeading(m.getAngle());
+				return WarLight.ACTION_MOVE;
+			}
+			
+			return WarLight.ACTION_MOVE;
+			
+		}
+	};
+	
 	static WTask attackbase = new WTask() { 
 		String exec(WarBrain bc){
 			WarLightBrainController me = (WarLightBrainController) bc;
@@ -183,9 +272,18 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 		}
 	};
 
+		public void reflexes(){
+			setDebugString("reflexes");
+			if (getHealth()/getMaxHealth() < 0.2) {
+				broadcastMessageToAgentType(WarAgentType.WarBase, "where", "");
+				ctask=retourbaseheal;
+			}
+		}
+		
 	@Override
 	public String action() {
 
+		reflexes();
 		String toReturn = ctask.exec(this);   // le run de la FSM
 
 		if(toReturn == null){
@@ -200,6 +298,14 @@ public abstract class WarLightBrainController extends  WarLightBrain {
 	private WarMessage getMessageFromExplorer() {
 		for (WarMessage m : getMessages()) {
 			if(m.getSenderType().equals(WarAgentType.WarExplorer))
+				return m;
+		}
+		return null;	
+	}
+	
+	private WarMessage getMessageFromBase() {
+		for (WarMessage m : getMessages()) {
+			if(m.getSenderType().equals(WarAgentType.WarBase))
 				return m;
 		}
 		return null;	
