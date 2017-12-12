@@ -173,7 +173,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 		}
 	};
 
-	static WTask aimBase = new WTask() { 
+	static WTask goForward = new WTask() { 
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
 
