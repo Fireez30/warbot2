@@ -119,7 +119,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
 			
-			//me.timeOut++;
+			me.timeOut++;
 
 			List<WarMessage> msgE = me.getMessages();
 
@@ -139,15 +139,20 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 					}
 				}
 
-			if (angle == -1 || dist == -1) {
+			if (me.timeOut > 300) {
 				me.setDebugString("fuck off");
 				me.ctask=randomMove;
 				return null;
+			}
+			else if (angle == -1 || dist == -1 || angle2 == -1 || dist2 == -1) {
+				return ACTION_MOVE;
 			}
 
 			me.setHeading(me.getTargetedAgentPosition(angle2, dist2, angle, dist).getAngle());
 			me.setTargetDistance(me.getTargetedAgentPosition(angle2, dist2, angle, dist).getDistance());
 
+			me.timeOut = 0;
+			
 			me.ctask = attackbase;
 			return null;
 		}
