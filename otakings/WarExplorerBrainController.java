@@ -103,11 +103,10 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					if (msg.get(0).getMessage().equals("A")){
 						me.setDebugString("Got Mail");
 						me.sendMessage(msg.get(0).getSenderID(), "!A","");
-					}
-					
-					if (msg.get(0).getMessage().equals("Coord")) {
-						me.sendMessage(msg.get(0).getSenderID(), "Angle", Double.toString(me.getHeading()));
-						me.sendMessage(msg.get(0).getSenderID(), "Distance", Double.toString(EnemyBasePercepts.get(0).getDistance()));
+						if (msg.get(0).getSenderType() == WarAgentType.WarRocketLauncher) {
+							me.ctask = givingCoord;
+							return null;
+						}
 					}
 				}
 			}
@@ -123,6 +122,22 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 		}
 	};
 
+	static WTask givingCoord = new WTask() {
+		String exec(WarBrain bc) {
+			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
+			List<WarMessage> msg = me.getMessages();
+			for (int i=0;i<msg.size();i++) 			
+				if (msg.get(0).getMessage().equals("Coord")) {
+					me.sendMessage(msg.get(0).getSenderID(), "Angle", Double.toString(me.getHeading()));
+					me.sendMessage(msg.get(0).getSenderID(), "Distance", Double.toString(EnemyBasePercepts.get(0).getDistance()));
+				}
+			me.ctask = waitForPeople;
+			me.timeOut = 0;s
+			return null;
+		}
+	};
+	
 
 	static WTask idle = new WTask(){
 		String exec(WarBrain bc){
