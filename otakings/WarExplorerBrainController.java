@@ -104,7 +104,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 						me.setDebugString("Got Mail");
 						me.sendMessage(msg.get(0).getSenderID(), "!A","");
 						if (msg.get(0).getSenderType() == WarAgentType.WarRocketLauncher) {
-							timeOut = 0;
+							me.timeOut = 0;
 							me.ctask = givingCoord;
 							return null;
 						}
@@ -133,8 +133,12 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			List<WarMessage> msg = me.getMessages();
 			for (int i=0;i<msg.size();i++) 			
 				if (msg.get(0).getMessage().equals("Coord")) {
-					me.sendMessage(msg.get(0).getSenderID(), "Angle", Double.toString(me.getHeading()));
-					me.sendMessage(msg.get(0).getSenderID(), "Distance", Double.toString(EnemyBasePercepts.get(0).getDistance()));
+					String[] coord = new String[2];
+					
+					coord[0] = me.getHeading() + "";
+					coord[1] = EnemyBasePercepts.get(0).getDistance() + "";
+					
+					me.sendMessage(msg.get(0).getSenderID(), "COORD", coord);
 				}
 
 
@@ -143,6 +147,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 				me.timeOut = 0;
 				return null;
 			}
+			return ACTION_IDLE;
 		}
 	};
 
