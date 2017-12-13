@@ -115,13 +115,11 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 		ctask= randomMove;
 	}
 
-	static PolarCoordinates PC;
-
 	static WTask aimBase = new WTask() { 
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
 			
-			me.timeOut++;
+			//me.timeOut++;
 
 			List<WarMessage> msgE = me.getMessages();
 
@@ -132,14 +130,11 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 
 			for(int i=0;i<msgE.size();i++) 
 				if (msgE.get(i).getSenderType() == WarAgentType.WarExplorer) {
-					if (msgE.get(i).getMessage().equals("Angle")) { 
-						me.setDebugString("Angle de base adverse recu ! ");
+					if (msgE.get(i).getMessage().equals("COORD")) { 
+						me.setDebugString("Coordonées de base adverse recu ! ");
 						angle = (double) Integer.parseInt(msgE.get(i).getContent()[0]);
 						angle2 = msgE.get(i).getAngle();
-					}
-					if (msgE.get(i).getMessage().equals("Distance")) { 
-						me.setDebugString("Ditance de base adverse recu ! ");
-						dist = (double) Integer.parseInt(msgE.get(i).getContent()[0]);
+						dist = (double) Integer.parseInt(msgE.get(i).getContent()[1]);
 						dist2 = msgE.get(i).getDistance();
 					}
 				}
