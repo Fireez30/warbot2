@@ -24,24 +24,13 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
 
-			//getMessageEnnemyBase "B"
-
 			List<WarMessage> msgE = me.getMessages();
 
 			for(int i=0;i<msgE.size();i++) {
 				if (msgE.get(i).getSenderType() == WarAgentType.WarExplorer) {
 					if (msgE.get(i).getMessage().equals("B")) {
 						me.setDebugString("Message base adverse recu ! ");
-						me.sendMessage(msgE.get(i).getSenderID(), "ARL", "");
-						me.ctask = waitAnswer;
-						return null;
-					}
-				}
-
-				if (msgE.get(i).getSenderType() == WarAgentType.WarBase) {
-					if (msgE.get(i).getMessage().equals("UA")) {
-						me.setDebugString("Base en danger ! ");
-						me.sendMessage(msgE.get(i).getSenderID(), "AUA");
+						me.sendMessage(msgE.get(i).getSenderID(), "A", "");
 						me.ctask = waitAnswer;
 						return null;
 					}
@@ -112,6 +101,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
 			me.setDebugString("WarRocketLauncher");
+			
 			if(me.isBlocked())
 				me.setRandomHeading();
 
@@ -130,7 +120,8 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 	static WTask aimBase = new WTask() { 
 		String exec(WarBrain bc){
 			WarRocketLauncherBrainController me = (WarRocketLauncherBrainController) bc;
-
+			
+			me.timeOut++;
 
 			List<WarMessage> msgE = me.getMessages();
 
@@ -154,6 +145,7 @@ public abstract class WarRocketLauncherBrainController extends  WarRocketLaunche
 				}
 
 			if (angle == -1 || dist == -1) {
+				me.setDebugString("fuck off");
 				me.ctask=randomMove;
 				return null;
 			}
