@@ -91,7 +91,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 			me.timeOut++;
 			me.setDebugString("En attente de reponse");
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
-			
+
 			List<WarMessage> msg = me.getMessages();
 			if (me.timeOut < 350) {
 				if (msg == null) {
@@ -104,6 +104,7 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 						me.setDebugString("Got Mail");
 						me.sendMessage(msg.get(0).getSenderID(), "!A","");
 						if (msg.get(0).getSenderType() == WarAgentType.WarRocketLauncher) {
+							timeOut = 0;
 							me.ctask = givingCoord;
 							return null;
 						}
@@ -125,6 +126,9 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 	static WTask givingCoord = new WTask() {
 		String exec(WarBrain bc) {
 			WarExplorerBrainController me = (WarExplorerBrainController) bc;
+
+			me.timeOut++;
+
 			ArrayList<WarAgentPercept> EnemyBasePercepts = (ArrayList<WarAgentPercept>) me.getPerceptsEnemiesByType(WarAgentType.WarBase);
 			List<WarMessage> msg = me.getMessages();
 			for (int i=0;i<msg.size();i++) 			
@@ -132,12 +136,16 @@ public abstract class WarExplorerBrainController extends WarExplorerBrain {
 					me.sendMessage(msg.get(0).getSenderID(), "Angle", Double.toString(me.getHeading()));
 					me.sendMessage(msg.get(0).getSenderID(), "Distance", Double.toString(EnemyBasePercepts.get(0).getDistance()));
 				}
-			me.ctask = waitForPeople;
-			me.timeOut = 0;s
-			return null;
+
+
+			if (me.timeOut > 150) {
+				me.ctask = waitForPeople;
+				me.timeOut = 0;
+				return null;
+			}
 		}
 	};
-	
+
 
 	static WTask idle = new WTask(){
 		String exec(WarBrain bc){
